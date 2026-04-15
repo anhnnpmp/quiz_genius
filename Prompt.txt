@@ -1,0 +1,90 @@
+
+-------------------------
+
+
+Act as a senior system architect. We are building "QuizGenius" a SaaS where users paste text and AI converts it into flashcards.
+
+Tech stack: react(vite), tailwindcss, supabase, google gemini api.
+
+Task: create a comprehensive 'SPEC.md'.
+It must define:
+1. The database schema (tables: decks, flashcards).
+2. The JSON interface for the AI generation (strict schema)
+3. The component hierarchy (App->InputSection->FlashcardGrid).
+
+
+------------
+
+looks pretty good. Add a difficulty to the flashcards. tell the gemini API the resulting questions all need to have a difficulty.
+UI: Add a component Study View which only shows one flashcard at a time
+
+-------------
+Task: Generate the Supabase SQL Setup script ('setup.sql').
+1. Create tables for 'desks' and 'flashcards' based on the spec.
+2. Enable Row Level Security (RLS) but allow public access for now (MVP mode).
+3. Insert mock data: @Web search for information about Rome and add a Desk titled 'History of Rome' with 5 sample Q&A cards.
+
+-------------
+
+Task: Create the logic to talk to Gemini.
+1. Create 'src/services/geminiService.js'.
+2. Implement a funciton 'generateFlashcards(text)' that calls the API.
+3. System Prompt to use: "Extract 4 facts and return strictly as a JSON array: [{front: 'Question', back: 'Answer',,difficulty: ''}]"
+4. Add error handling to catch invalid JSON response.
+
+--------------
+Task: Build the visual components.
+1. Create 'src/components/Flashcard.jsx'.
+2. Style: White card, rounded corners, soft shadow.
+3. Animation: Use Tailwind 'transform' utitilities to create a 3D flip effect on click.
+4. Create a 'MasonryGrid' layout to display multiple cards.
+
+----------------
+
+Act as a Senior Frontend Developer. We are merging the Logic and UI lanes.
+
+Refactor 'src/App.jsx' to implement the full functionality described in SPEC.md:
+1. **State Management**: Replace the hardcoded 'cards' array with a React state 'flashcards' (Default to empty array). Add 'isLoading' state.
+2. **Input Section**: Add a Textarea and a "Generate Flashcards" button at the top (Component: 'InputSection').
+3. **Integration**: When the button is clicked, call 'generateFlashcards(text)' from the service. Show a loading spinner while waiting.
+4. **Display**: Pass the resulting data to the existing 'MasonryGrid'
+
+--------------
+
+We need to upgrade the app to support multiple decks and a dashboard.
+Act as a Senior Frontend Developer and refactor 'src/App.jsx'
+
+1. **State Management**:
+- Change 'viewMode' to support: "dashboard" | "grid" | "study". Default is 'dashboard'.
+- Add state 'decks' (array of all decks) and 'currentDeck' (the currently selected deck object).
+
+2. **Dashboard View** (Visible when 'viewMode === 'dashboard'):
+- Display a list/grid of all available decks from the database.
+- **Statitics**. for each deck, display a grogress badge: "Mastered: X/Y" (Count cards where 'difficulty' is 'Easy' vs Total cards).
+- Clicking a deck sets it as 'currentDeck' and switches 'viewMode' to 'grid'.
+
+3. **Input Section Update**:
+- Add a new input filed 'Deck Title' above the text area.
+- When 'Generate' is clicked, use this title for the new deck reaction.
+
+4. **Grid View** (Visible when 'viewMode === 'grid'):
+- Show the cards of the 'currentDeck'.
+- Add a 'Back to Dashboard' button.
+- Add the 'Start Studying' button here.
+
+5. **Study Mode** (Visible when 'viewMode === 'study'):
+- Show only the 'current' card (large & centered).
+- Buttons: 'Previous', 'Next', and 'Exit Study' (returns to 'grid').
+- Interaction: Add buttons 'I knew this' (Sets difficulty = 'Easy') and 'Hard' (Sets difficulty = 'Hard').
+- Progress bar: 'Card X of Y'.
+
+Ensure the design remains clean using TailwindCSS. Keep the existing Supabase fetching logic but adapt it to load the list of decks first.
+
+
+------------------
+
+Act as a DevOps Engineer. We want to deploy this vite/react app to Vercel.
+
+1. **build check**: Run 'npm run build' in the terminal to verify that the project compilers without errors. If there are errors, fix them.
+2. **Configuration**: Create a 'vercel.json' file in the root directory. Configure it to handle 'Rewrites' for a Single Page Application (SPA), so that all routes point to 'index.html'. 
+3. **Documentation**: Create a file 'DEPLOY.md'. List All environment variables that i need to add to the vercel dashdoard.
